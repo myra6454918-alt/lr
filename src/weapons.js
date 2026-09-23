@@ -17,28 +17,36 @@ const GRENADES = [];
 
 /* ---------- модель автомата от первого лица ---------- */
 function buildViewmodel(){
+  // современный автомат в чёрном полимере с коллиматором: тёмные матовые
+  // поверхности читаются реалистичнее, чем яркое дерево
   const G = new THREE.Group();
-  const metal = new THREE.MeshStandardMaterial({color:0x1f2022, roughness:.45, metalness:.75, envMapIntensity:1.1});
-  const metal2 = new THREE.MeshStandardMaterial({color:0x2c2d2f, roughness:.55, metalness:.6});
-  const wood = new THREE.MeshStandardMaterial({color:0x4a2a17, roughness:.5, metalness:.02, envMapIntensity:.7});
+  const metal = new THREE.MeshStandardMaterial({color:0x17181a, roughness:.42, metalness:.7, envMapIntensity:1.0});
+  const poly  = new THREE.MeshStandardMaterial({color:0x222321, roughness:.78, metalness:.05, envMapIntensity:.6});
+  const tan   = new THREE.MeshStandardMaterial({color:0x5b5443, roughness:.8, metalness:.02});
   const add = (geo, mat, x,y,z, rx=0,ry=0,rz=0)=>{ const m = new THREE.Mesh(geo, mat); m.position.set(x,y,z); m.rotation.set(rx,ry,rz); G.add(m); return m; };
-  add(roundedBox(0.05, 0.075, 0.34, 0.01, 2), metal, 0, 0, 0);                      // ствольная коробка
-  add(new THREE.BoxGeometry(0.046, 0.02, 0.3), metal2, 0, 0.045, -0.01);             // крышка
-  add(new THREE.CylinderGeometry(0.009, 0.009, 0.42, 10), metal, 0, 0.012, -0.38, Math.PI/2);  // ствол
-  add(new THREE.CylinderGeometry(0.008, 0.008, 0.26, 8), metal, 0, 0.038, -0.3, Math.PI/2);    // газовая трубка
-  add(roundedBox(0.056, 0.05, 0.2, 0.012, 2), wood, 0, 0.0, -0.26);                  // цевьё
-  add(roundedBox(0.05, 0.035, 0.17, 0.01, 2), wood, 0, 0.042, -0.29);                // накладка
-  add(new THREE.BoxGeometry(0.012, 0.035, 0.014), metal, 0, 0.042, -0.56);           // мушка
-  add(new THREE.BoxGeometry(0.03, 0.02, 0.03), metal, 0, 0.06, -0.06);               // целик
-  add(new THREE.CylinderGeometry(0.014, 0.012, 0.05, 8), metal, 0, 0.012, -0.61, Math.PI/2);   // ДТК
-  // изогнутый магазин из трёх секций
-  for(let i=0;i<3;i++) add(roundedBox(0.03, 0.075, 0.06, 0.006, 1), metal2, 0, -0.07 - i*0.06, -0.06 + i*0.022, -0.35 - i*0.12, 0, 0);
-  add(roundedBox(0.035, 0.1, 0.045, 0.01, 2), wood, 0, -0.07, 0.11, 0.35, 0, 0);    // рукоять
-  add(new THREE.BoxGeometry(0.008, 0.03, 0.05), metal, 0, -0.045, 0.05);             // спуск
-  add(roundedBox(0.042, 0.08, 0.22, 0.015, 2), wood, 0, -0.03, 0.27, 0.12, 0, 0);   // приклад
+  add(roundedBox(0.046, 0.07, 0.3, 0.008, 2), metal, 0, 0, 0);                        // ствольная коробка
+  add(new THREE.BoxGeometry(0.03, 0.012, 0.36), metal, 0, 0.041, -0.05);              // планка
+  for(let i=0;i<14;i++) add(new THREE.BoxGeometry(0.034, 0.006, 0.008), metal, 0, 0.049, 0.1 - i*0.024);
+  add(roundedBox(0.056, 0.058, 0.24, 0.014, 2), poly, 0, 0.004, -0.27);                // цевьё
+  add(new THREE.CylinderGeometry(0.0085, 0.0085, 0.2, 10), metal, 0, 0.01, -0.47, Math.PI/2);   // ствол
+  add(new THREE.CylinderGeometry(0.016, 0.014, 0.07, 10), metal, 0, 0.01, -0.6, Math.PI/2);     // ДТК
+  // коллиматор
+  // коллиматор: полая рамка-тубус, сквозь которую видно цель, точка — на стекле
+  add(new THREE.BoxGeometry(0.03, 0.012, 0.05), metal, 0, 0.052, -0.02);            // основание
+  add(new THREE.BoxGeometry(0.036, 0.005, 0.06), metal, 0, 0.0965, -0.02);           // верх
+  for(const sx of [-1,1]) add(new THREE.BoxGeometry(0.005, 0.04, 0.06), metal, sx*0.0155, 0.076, -0.02);
+  add(new THREE.PlaneGeometry(0.027, 0.036), new THREE.MeshStandardMaterial({color:0x6a8fa0, roughness:.05, metalness:.5,
+    transparent:true, opacity:.18, depthWrite:false}), 0, 0.076, -0.045);
+  const dot = add(new THREE.CircleGeometry(0.0011, 10), new THREE.MeshBasicMaterial({color:0xff2a1a, depthTest:false}), 0, 0.075, -0.044);
+  dot.userData.dot = true;
+  // магазин, рукоять, приклад
+  for(let i=0;i<3;i++) add(roundedBox(0.028, 0.07, 0.056, 0.006, 1), tan, 0, -0.068 - i*0.056, -0.05 + i*0.02, -0.33 - i*0.1);
+  add(roundedBox(0.034, 0.095, 0.042, 0.01, 2), poly, 0, -0.066, 0.1, 0.32);
+  add(new THREE.BoxGeometry(0.008, 0.028, 0.045), metal, 0, -0.042, 0.045);
+  add(roundedBox(0.04, 0.07, 0.17, 0.014, 2), poly, 0, -0.03, 0.22, 0.08);
   const flash = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.22), new THREE.MeshBasicMaterial({map:FXS.flash.mesh.material.uniforms.map.value,
     color:0xffc07a, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false, opacity:0}));
-  flash.position.set(0, 0.012, -0.68); G.add(flash);
+  flash.position.set(0, 0.01, -0.68); G.add(flash);
   const flash2 = flash.clone(); flash2.rotation.y = Math.PI/2; flash2.material = flash.material; G.add(flash2);
   G.userData.flash = flash.material;
   G.traverse(o=>{ if(o.isMesh){ o.castShadow = false; o.receiveShadow = false; o.frustumCulled = false; o.renderOrder = 10; } });
@@ -92,7 +100,7 @@ function shoot(){
   const ej = V(0.06, 0.02, -0.05).applyQuaternion(camera.quaternion).add(camera.position);
   FXS.splinters.spawn(ej, V(0.9,1.2,0.2).applyQuaternion(camera.quaternion).add(V(rnd(-.3,.3),rnd(0,.4),rnd(-.3,.3))), V(0.009,0.009,0.03), PL.eye.y - 1.6, 4);
 }
-function muzzleWorld(){ return V(0.0, 0.012, -0.68).applyMatrix4(WPN.viewmodel.matrixWorld); }
+function muzzleWorld(){ return V(0.0, 0.01, -0.66).applyMatrix4(WPN.viewmodel.matrixWorld); }
 
 /* ---------- граната ---------- */
 let nadeGeo = null;
@@ -163,6 +171,12 @@ export function blastFX(p, big=1){
     for(let i=0;i<18;i++){ const a = i/18*Math.PI*2;
       FXS.dust.spawn({p: V(p.x, fy+0.2, p.z), v: V(Math.cos(a)*rnd(4,7), rnd(0.2,0.8), Math.sin(a)*rnd(4,7)), life:rnd(2.5,4.5),
         s0:0.6, s1:2.4, col:[0.62,0.6,0.56], a0:0.5, a1:0, drag:2.2, fadeIn:0.05}); }
+  }
+  // с ферм и кровли от удара сыплется пыль
+  for(let i=0;i<Math.round(14*big);i++){
+    const q = V(p.x + rnd(-6,6), rnd(7.5,9.5), p.z + rnd(-6,6));
+    FXS.dust.spawn({p:q, v:V(rnd(-0.1,0.1), rnd(-0.6,-0.2), rnd(-0.1,0.1)), life:rnd(4,7), s0:0.3, s1:1.6,
+      col:[0.7,0.68,0.64], a0:0.22, a1:0, drag:0.3, g:-0.15, fadeIn:0.8});
   }
   SND.explosion(p, big);
 }
@@ -258,10 +272,10 @@ export function updateWeapons(dt, t){
   const ads = PL.ads, run = PL.sprint ? 1 : 0;
   const rl = WPN.reloadT > 0 ? Math.sin(clamp(1 - WPN.reloadT/2.2, 0, 1)*Math.PI) : 0;
   const bobA = (PL.speed > 0.5 ? 0.012 : 0.003) * (1-ads*0.85);
-  vm.position.set(lerp(0.13, 0.0, ads) + Math.cos(swayT)*bobA + run*0.05,
-                  lerp(-0.135, -0.086, ads) - Math.abs(Math.sin(swayT))*bobA - rl*0.12 - run*0.03,
-                  lerp(-0.5, -0.4, ads) + WPN.kick*0.012 + PL.recoil*0.4);
-  vm.rotation.set(PL.recoil*1.4 - rl*0.6 + run*-0.3, run*0.6 + rl*0.3, rl*0.5 + run*0.25);
+  vm.position.set(lerp(0.12, 0.0, ads) + Math.cos(swayT)*bobA + run*0.05,
+                  lerp(-0.14, -0.075, ads) - Math.abs(Math.sin(swayT))*bobA - rl*0.12 - run*0.03,
+                  lerp(-0.42, -0.24, ads) + WPN.kick*0.012 + PL.recoil*0.4);
+  vm.rotation.set(PL.recoil*1.4 - rl*0.6 + run*-0.3, lerp(0.035, 0, ads) + run*0.6 + rl*0.3, rl*0.5 + run*0.25);
   vm.visible = PL.alive && !PL.fly;
 }
 export function weaponKey(code){

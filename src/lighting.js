@@ -43,7 +43,7 @@ function buildLights(){
   FILLS.push(f1,f2,f3,bounce);
 
   for(let i=0;i<Q.lights;i++){
-    const L = new THREE.PointLight(0xe6e4dc, 0, 16, 2);
+    const L = new THREE.PointLight(0xe6e4dc, 0, 24, 2);
     L.position.set(0,-60,0); scene.add(L); LIGHT_POOL.push(L);
   }
 }
@@ -176,7 +176,7 @@ function updateLightPool(pos){
   if(!LAMPS.length) return;
   LAMPS.forEach(l => l.d = (l.pos.x-pos.x)**2 + (l.pos.z-pos.z)**2);
   const near = LAMPS.filter(l=>l.on && l.lit > 0.02).sort((a,b)=>a.d-b.d).slice(0, LIGHT_POOL.length);
-  const power = lerp(5, 30, LAMP_LEVEL);
+  const power = lerp(20, 150, LAMP_LEVEL);
   near.forEach((l,i)=>{
     const L = LIGHT_POOL[i];
     L.position.copy(l.pos);
@@ -298,7 +298,7 @@ function applyDaylight(t){
   const moonUp = clamp(MOON_DIR.y, 0, 1);
   const nightK = smoothstep(0.06, -0.14, elev);          // 0 днём, 1 ночью
   moon.position.copy(MOON_DIR).multiplyScalar(R).add(sunTarget.position);
-  moon.intensity = 0.34 * nightK * smoothstep(0.0, 0.35, moonUp);
+  moon.intensity = 0.6 * nightK * smoothstep(0.0, 0.35, moonUp);
   moon.visible = moon.intensity > 0.004;
 
   hemi.color.copy(k.hemiSky); hemi.groundColor.copy(k.hemiGnd);

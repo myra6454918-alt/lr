@@ -16,9 +16,9 @@ const V = (x=0,y=0,z=0)=> new THREE.Vector3(x,y,z);
 const sym = (fn, x, z, rotY=0, ...rest)=>{ fn(x, z, rotY, ...rest); fn(-x, -z, rotY+Math.PI, ...rest); };
 
 export const TEAMS = {
-  ALPHA: { name:'ALPHA', color:'#d7dde4', accent:0xbfd4ee, side:-1, flag:{x:-31.2, z:0},
+  ALPHA: { name:'ALPHA', color:'#d7dde4', accent:0xbfd4ee, side:-1, flag:{x:-31.2, z:-2.3},
            spawns:[ {id:'A1', name:'Бункер', x:-35.4, z:0}, {id:'A2', name:'Север', x:-34.2, z:-14.5}, {id:'A3', name:'Юг', x:-34.2, z:14.5} ] },
-  DELTA: { name:'DELTA', color:'#a9cf86', accent:0xb8e08c, side: 1, flag:{x: 31.2, z:0},
+  DELTA: { name:'DELTA', color:'#a9cf86', accent:0xb8e08c, side: 1, flag:{x: 31.2, z:2.3},
            spawns:[ {id:'D1', name:'Бункер', x: 35.4, z:0}, {id:'D2', name:'Север', x: 34.2, z:-14.5}, {id:'D3', name:'Юг', x: 34.2, z:14.5} ] }
 };
 export const TEAM_LIGHTS = [], GATES = [], TEAM_SPOTS = [];
@@ -27,13 +27,17 @@ export const TEAM_LIGHTS = [], GATES = [], TEAM_SPOTS = [];
 const _contMats = {};
 export function container(x, z, rotY, col=0x5b6f7a, y=0){
   let mat = _contMats[col];
-  if(!mat){ mat = M.corr.clone(); mat.color = new THREE.Color(col).multiplyScalar(1.6); mat.vertexColors = false; mat.metalness = 0.12; mat.side = THREE.FrontSide; _contMats[col] = mat; }
+  if(!mat){
+    // свой материал на основе карт профлиста: цвет краски + рёбра нормалями
+    mat = new THREE.MeshStandardMaterial({ map: M.corr.map, normalMap: M.corr.normalMap, normalScale: new THREE.Vector2(1.1,1.1),
+      color: new THREE.Color(col).multiplyScalar(4.2), roughness: .78, metalness: .15, envMapIntensity: .7 });
+    _contMats[col] = mat; }
   const L = 6.06, W = 2.44, H = 2.59;
   const G = new THREE.Group();
   const body = new THREE.Mesh(new THREE.BoxGeometry(L-0.1, H-0.12, W-0.08), mat);
   const uv = body.geometry.attributes.uv; for(let i=0;i<uv.count;i++) uv.setXY(i, uv.getX(i)*3, uv.getY(i)*1.3);
   body.position.y = H/2; G.add(body);
-  const frame = cmat(0x2c2f31, {roughness:.7, metalness:.5});
+  const frame = cmat(0x4a4d4f, {roughness:.7, metalness:.4});
   for(const sx of [-1,1]) for(const sz of [-1,1]){
     const post = new THREE.Mesh(new THREE.BoxGeometry(0.16, H, 0.16), frame); post.position.set(sx*(L/2-0.08), H/2, sz*(W/2-0.08)); G.add(post);
     const cast = new THREE.Mesh(new THREE.BoxGeometry(0.18,0.12,0.18), frame); cast.position.set(sx*(L/2-0.08), H-0.06, sz*(W/2-0.08)); G.add(cast);

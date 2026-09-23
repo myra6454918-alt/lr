@@ -297,13 +297,14 @@ function api(stats){
     THREE, scene, camera, renderer, PH, DEST, FIRES, PL, WPN, TEAMS, COLLIDERS, stats, keys, INPUT,
     step:(dt=1/60, n=1)=>{ for(let i=0;i<n;i++) step(dt); },
     render:()=> L.getComposer().render(),
-    view:(x,y,z, lx,ly,lz)=>{ PL.fly = true; PL.char.enable(false); PL.flyPos.set(x,y,z); camera.position.set(x,y,z);
+    view:(x,y,z, lx,ly,lz)=>{ WPN.viewmodel.visible = false; PL.fly = true; PL.char.enable(false); PL.flyPos.set(x,y,z); camera.position.set(x,y,z);
       const d = new THREE.Vector3(lx-x, ly-y, lz-z).normalize(); PL.yaw = Math.atan2(-d.x, -d.z); PL.pitch = Math.asin(d.y);
       updatePlayer(0, 0); },
     walkTo:(x,z)=>{ setFly(false); PL.char.warp(new THREE.Vector3(x, 1.2, z)); },
     deploy:(team='ALPHA', id)=>{ STATE.team = team; STATE.spawn = TEAMS[team].spawns.find(s=>s.id===id) || TEAMS[team].spawns[0]; deploy(); },
     shoot:()=>{ INPUT.locked = true; WPN.cool = 0; INPUT.mouseDown = true; updateWeapons(0.001, 0); INPUT.mouseDown = false; },
     grenade:(x,y,z)=> grenadeExplode(new THREE.Vector3(x,y,z), 1),
+    throw:(code='KeyG')=> weaponKey(code),
     fire:(x,y,z,s=1)=> ignite(new THREE.Vector3(x,y,z), s, 1.5, s>=0.9),
     time:(t)=>{ L.DAY.t = t; L.applyDaylight(t); renderer.shadowMap.needsUpdate = true; },
     pause:(v=true)=>{ L.DAY.paused = v; },

@@ -361,7 +361,7 @@ function floodMast(x, z, aimX, aimZ, h=9.0){
   spot.position.set(x, h-0.35, z);
   spot.target.position.set(aimX, 0.4, aimZ);
   scene.add(spot); scene.add(spot.target);
-  FLOODS.push({light:spot, peak: 42});
+  FLOODS.push({light:spot, peak: 220});
 }
 /** Настенный натриевый светильник-«кобра» под козырьком. */
 function wallLamp(x, y, z, rotY){

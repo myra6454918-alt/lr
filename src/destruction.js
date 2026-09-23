@@ -567,6 +567,8 @@ export function flushDestruction(){
 export function bulletHit(hit, dir, power){
   const own = hit.idx >= 0 ? PH.owners[hit.idx] : null;
   const dmg = 34*power;
+  // ткань флага (soft body без индекса): пуля дёргает полотнище и летит дальше
+  if(hit.idx === -1){ pokeCloth(hit.p, 0.35, 30*power); return {stop:false, cost:0.02, surf:'cloth'}; }
   if(!own){
     const surf = SURF_NAME[hit.idx] || 'conc';
     impactFX(hit.p, hit.n, surf, dir);
