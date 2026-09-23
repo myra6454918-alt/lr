@@ -7,7 +7,7 @@ import * as L from './lighting.js';
 import { buildHouse, INTERIOR, F2 } from './house.js';
 import { buildLayout, TEAMS, TEAM_LIGHTS, GATES, TEAM_SPOTS } from './layout.js';
 import { initPhysics, buildStaticWorld, stepPhysics, PH, addDynamic, GRP, rayFirst } from './physics.js';
-import { initDestructiblePhysics, registerGlass, HOOKS, DEST, flushDestruction, explode, resetDebrisBudget } from './destruction.js';
+import { initDestructiblePhysics, registerGlass, HOOKS, DEST, flushDestruction, explode, resetDebrisBudget, breakProp } from './destruction.js';
 import { initFX, updateFX, FXS, SND, FXU } from './fx.js';
 import { initFire, updateFire, FIRES, fireAt, ignite } from './fire.js';
 import { initPlayer, updatePlayer, PL, INPUT, spawnAt, setFly, keys, hurt } from './player.js';
@@ -305,6 +305,8 @@ function api(stats){
     shoot:()=>{ INPUT.locked = true; WPN.cool = 0; INPUT.mouseDown = true; updateWeapons(0.001, 0); INPUT.mouseDown = false; },
     grenade:(x,y,z)=> grenadeExplode(new THREE.Vector3(x,y,z), 1),
     throw:(code='KeyG')=> weaponKey(code),
+    blowBarrel:(x=-28,z=-27)=>{ const p = DEST.props.filter(q=>q.explosive && !q.dead).sort((a,b)=>Math.hypot(a.center.x-x,a.center.z-z)-Math.hypot(b.center.x-x,b.center.z-z))[0];
+      if(p) breakProp(p, p.center.clone(), new THREE.Vector3(1,0,0), 1, 'bullet'); return !!p; },
     fire:(x,y,z,s=1)=> ignite(new THREE.Vector3(x,y,z), s, 1.5, s>=0.9),
     time:(t)=>{ L.DAY.t = t; L.applyDaylight(t); renderer.shadowMap.needsUpdate = true; },
     pause:(v=true)=>{ L.DAY.paused = v; },

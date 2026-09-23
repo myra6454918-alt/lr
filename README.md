@@ -46,3 +46,13 @@ python3 -m http.server 8000
   навесами из габионов, по 3 точки возрождения, центрально-симметричные линии укрытий.
 
 `legacy/angar_map_original.html` — исходная версия карты для сравнения.
+
+## Скриншоты
+
+| | |
+|---|---|
+| ![](docs/01_lane.jpg) | ![](docs/02_doorway.jpg) |
+| ![](docs/03_stairs.jpg) | ![](docs/05_ext_stairs.jpg) |
+| ![](docs/06_heli.jpg) | ![](docs/07_base_alpha.jpg) |
+| ![](docs/09_grenade.jpg) | ![](docs/10_fire.jpg) |
+| ![](docs/11_barrel.jpg) | ![](docs/13_night.jpg) |
